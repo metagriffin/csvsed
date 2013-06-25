@@ -2,11 +2,15 @@
 #------------------------------------------------------------------------------
 # file: $Id$
 # lib:  csvsed.sed
-# desc: a stream-oriented CSV modification tool.
 # auth: metagriffin <metagriffin@uberdev.org>
 # date: 2009/08/04
 # copy: (C) CopyLoose 2009 UberDev <hardcore@uberdev.org>, No Rights Reserved.
 #------------------------------------------------------------------------------
+
+'''
+A stream-oriented CSV modification tool. Like a stripped-down "sed"
+command, but for tabular data.
+'''
 
 import re, string, types
 from csvkit.exceptions import ColumnIdentifierError
@@ -58,8 +62,15 @@ class CsvFilter(object):
 
       * Transliteration: "y/SRC/DST/FLAGS"
 
+        (This is a slightly modified version of sed's "y" command.)
+
         Each character in `SRC` is replaced with the corresponding
-        character in `DST`. Only the "i" flag is supported.
+        character in `DST`. The dash character ("-") indicates a range
+        of characters (e.g. "a-z" for all alphabetic characters).  If
+        the dash is needed literally, then it must be the first or
+        last character, or escaped with "\". The "\" character escapes
+        itself. Only the "i" flag, indicating case-insensitive
+        matching of `SRC`, is supported.
 
       Note that the "/" character can be any character as long as it
       is used consistently and not used within the specification,
@@ -141,22 +152,63 @@ class S_modifier(object):
     return self.regex.sub(self.repl, val, count=self.count)
 
 #------------------------------------------------------------------------------
+def cranges(spec):
+  # todo: there must be a better way...
+  ret = ''
+  idx = 0
+  while idx < len(spec):
+    c = spec[idx]
+    idx += 1
+    if c == '-' and len(ret) > 0 and len(spec) > idx:
+      for i in range(ord(ret[-1]) + 1, ord(spec[idx]) + 1):
+        ret += chr(i)
+      idx += 1
+      continue
+    if c == '\\' and len(spec) > idx:
+      c = spec[idx]
+      idx += 1
+    ret += c
+  return ret
+
+#------------------------------------------------------------------------------
 class Y_modifier(object):
   'The "transliterate" modifier ("y/SOURCE/DESTINATION/FLAGS").'
+  # todo: the python2 string.maketrans & string.translate functions
+  #       only work on non-unicode input and csvkit produces unicode
+  #       values... so the current 'y' modifier does not use them.
+  #       *HOWEVER*, python3's version *does* work, so in py3 mode,
+  #       use that!
   def __init__(self, spec):
     super(Y_modifier, self).__init__()
     if not spec or len(spec) < 4 or spec[0] != 'y':
       raise InvalidModifierSpec(spec)
     tspec = spec.split(spec[1])
+    tspec[1] = cranges(tspec[1])
+    tspec[2] = cranges(tspec[2])
     if len(tspec) != 4:
       raise InvalidModifierSpec(spec)
     if 'i' in tspec[3].lower():
-      self.table = string.maketrans(tspec[1].lower() + tspec[1].upper(),
-                                    2 * tspec[2])
+      # self.table = string.maketrans(tspec[1].lower() + tspec[1].upper(),
+      #                               2 * tspec[2])
+      self.src = tspec[1].lower() + tspec[1].upper()
+      self.dst = 2 * tspec[2]
     else:
-      self.table = string.maketrans(tspec[1], tspec[2])
+      # self.table = string.maketrans(tspec[1], tspec[2])
+      self.src = tspec[1]
+      self.dst = tspec[2]
+    if len(self.src) != len(self.dst):
+      raise InvalidModifierSpec(spec)
   def __call__(self, val):
-    return string.translate(val, self.table)
+    # return string.translate(val, self.table)
+    # TODO: this could be *much* more efficient...
+    ret = ''
+    for ch in val:
+      idx = self.src.find(ch)
+      if idx < 0:
+        ret += ch
+      else:
+        ret += self.dst[idx]
+    return ret
 
 #------------------------------------------------------------------------------
 # end of $Id$

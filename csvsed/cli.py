@@ -20,7 +20,7 @@ from csvsed import sed
 #------------------------------------------------------------------------------
 class CsvSed(CSVKitUtility):
 
-  description = 'Stream-oriented CSV file modifier. Like a ' \
+  description = 'A stream-oriented CSV modification tool. Like a ' \
       ' stripped-down "sed" command, but for tabular data.'
   override_flags = 'f'
 
