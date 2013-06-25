@@ -137,6 +137,22 @@ f....ld 3.1,field 3.2,field 3.3,field 3.4,field 3.5
     chk = 'cell 1,123456789.0\n'
     self.assertMultiLineEqual(run(src, {1: 's/,//g'}, header=False), chk)
 
+  #----------------------------------------------------------------------------
+  def test_modifier_e_directcall(self):
+    self.assertEqual(sed.E_modifier('e/tr ab xy/')('b,a,c'), 'y,x,c')
+    self.assertEqual(sed.E_modifier('e/xargs -I {} echo "{}^2" | bc/')('4'), '16')
+
+  #----------------------------------------------------------------------------
+  def test_modifier_e_multipipe(self):
+    chk = '''\
+header 1,header 2,header 3,header 4,header 5
+field 1.1,field 1.2,field 1.3,1.96,field 1.5
+field 2.1,field 2.2,field 2.3,5.76,field 2.5
+field 3.1,field 3.2,field 3.3,11.56,field 3.5
+'''
+    self.assertMultiLineEqual(
+      run(self.baseCsv, {3: 'e/cut -f2 -d" " | xargs -I {} echo "scale=3;{}^2" | bc/'}), chk)
+
 #------------------------------------------------------------------------------
 # end of $Id$
 #------------------------------------------------------------------------------

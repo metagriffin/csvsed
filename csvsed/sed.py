@@ -12,7 +12,7 @@ A stream-oriented CSV modification tool. Like a stripped-down "sed"
 command, but for tabular data.
 '''
 
-import re, string, types
+import re, string, types, subprocess, csvkit, csv
 from csvkit.exceptions import ColumnIdentifierError
 
 #------------------------------------------------------------------------------
@@ -148,8 +148,8 @@ class S_modifier(object):
     self.regex = re.compile(sspec[1], flags)
     self.repl  = sspec[2]
     self.count = 0 if 'g' in sspec[3].lower() else 1
-  def __call__(self, val):
-    return self.regex.sub(self.repl, val, count=self.count)
+  def __call__(self, value):
+    return self.regex.sub(self.repl, value, count=self.count)
 
 #------------------------------------------------------------------------------
 def cranges(spec):
@@ -182,33 +182,85 @@ class Y_modifier(object):
     super(Y_modifier, self).__init__()
     if not spec or len(spec) < 4 or spec[0] != 'y':
       raise InvalidModifierSpec(spec)
-    tspec = spec.split(spec[1])
-    tspec[1] = cranges(tspec[1])
-    tspec[2] = cranges(tspec[2])
-    if len(tspec) != 4:
+    yspec = spec.split(spec[1])
+    if len(yspec) != 4:
       raise InvalidModifierSpec(spec)
-    if 'i' in tspec[3].lower():
-      # self.table = string.maketrans(tspec[1].lower() + tspec[1].upper(),
-      #                               2 * tspec[2])
-      self.src = tspec[1].lower() + tspec[1].upper()
-      self.dst = 2 * tspec[2]
+    yspec[1] = cranges(yspec[1])
+    yspec[2] = cranges(yspec[2])
+    if 'i' in yspec[3].lower():
+      # self.table = string.maketrans(yspec[1].lower() + yspec[1].upper(),
+      #                               2 * yspec[2])
+      self.src = yspec[1].lower() + yspec[1].upper()
+      self.dst = 2 * yspec[2]
     else:
-      # self.table = string.maketrans(tspec[1], tspec[2])
-      self.src = tspec[1]
-      self.dst = tspec[2]
+      # self.table = string.maketrans(yspec[1], yspec[2])
+      self.src = yspec[1]
+      self.dst = yspec[2]
     if len(self.src) != len(self.dst):
       raise InvalidModifierSpec(spec)
-  def __call__(self, val):
+  def __call__(self, value):
     # return string.translate(val, self.table)
     # TODO: this could be *much* more efficient...
     ret = ''
-    for ch in val:
+    for ch in value:
       idx = self.src.find(ch)
       if idx < 0:
         ret += ch
       else:
         ret += self.dst[idx]
     return ret
+
+#------------------------------------------------------------------------------
+class ReadlineIterator(object):
+  'An iterator that calls readline() to get its next value.'
+  # NOTE: this is a hack to make csv.reader not read-ahead.
+  def __init__(self, f): self.f = f
+  def __iter__(self): return self
+  def next(self):
+    line = self.f.readline()
+    if not line: raise StopIteration
+    return line
+
+#------------------------------------------------------------------------------
+class E_modifier(object):
+  'The "execute" external program modifier ("e/PROGRAM+OPTIONS/FLAGS").'
+  def __init__(self, spec):
+    super(E_modifier, self).__init__()
+    if not spec or len(spec) < 3 or spec[0] != 'e':
+      raise InvalidModifierSpec(spec)
+    espec = spec.split(spec[1])
+    if len(espec) != 3:
+      raise InvalidModifierSpec(spec)
+    espec[2] = espec[2].lower()
+    self.command = espec[1]
+    self.index   = 1 if 'i' in espec[2] else None
+    self.csv     = 'c' in espec[2]
+    if not self.csv:
+      return
+    self.proc = subprocess.Popen(
+      self.command, shell=True, bufsize=0,
+      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    self.writer = csvkit.CSVKitWriter(self.proc.stdin)
+    # note: not using csvkit's reader because there is no easy way of
+    # making it not read-ahead (which breaks the "continuous" mode).
+    # self.reader = csvkit.CSVKitReader(self.proc.stdout)
+    # todo: fix csvkit so that it can be used in non-read-ahead mode.
+    self.reader = csv.reader(ReadlineIterator(self.proc.stdout))
+  def __call__(self, value):
+    if not self.csv:
+      return self.execOnce(value)
+    self.writer.writerow([value])
+    return self.reader.next()[0].decode('utf-8')
+  def execOnce(self, value):
+    p = subprocess.Popen(
+      self.command, shell=True,
+      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, errput = p.communicate(value)
+    if p.returncode != 0:
+      raise Exception('command "%s" failed: %s' % (self.command, errput))
+    if output[-1] == '\n':
+      output = output[:-1]
+    return output
 
 #------------------------------------------------------------------------------
 # end of $Id$
