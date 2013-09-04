@@ -118,7 +118,7 @@ to names:
 
 .. code-block:: bash
 
-  $ cat sample.csv | csvsed -c 'Employee ID' 'e/id2name.py/c'
+  $ cat sample.csv | csvsed -c 'Employee ID' 'e|./id2name.py|c'
   Employee ID,Age,Wage,Status
   ElfenKyng,47,"104,343,873.83","All good, but nowhere to go."
   Stradivarius,32,"98,878,784.00",A-OK
