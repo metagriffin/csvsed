@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 # file: $Id: setup.py 346 2012-08-12 17:22:39Z griffin $
 # desc: the csvsed installation file
@@ -7,112 +8,74 @@
 # copy: (C) CopyLoose 2010 UberDev <hardcore@uberdev.org>, No Rights Reserved.
 #------------------------------------------------------------------------------
 
-import sys, os, re
+import sys, os, re, setuptools
 from setuptools import setup, find_packages
 
+# require python 2.7+
 if sys.hexversion < 0x02070000:
   raise RuntimeError('This package requires python 2.7 or better')
 
-here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
+heredir = os.path.abspath(os.path.dirname(__file__))
+def read(*parts):
+  try:    return open(os.path.join(heredir, *parts)).read()
+  except: return ''
 
-#------------------------------------------------------------------------------
-# ugh. why couldn't github just have supported rst??? ignats.
-#------------------------------------------------------------------------------
-mdheader = re.compile('^(#+) (.*)$', flags=re.MULTILINE)
-mdlevels = '=-~+"\''
-def hdrepl(match):
-  lvl = len(match.group(1)) - 1
-  if lvl < 0:
-    lvl = 0
-  if lvl >= len(mdlevels):
-    lvl = len(mdlevels) - 1
-  ret = match.group(2).strip()
-  return ret + '\n' + ( mdlevels[lvl] * len(ret) ) + '\n'
-#------------------------------------------------------------------------------
-mdquote = re.compile('^```(?: ?(\w+))?\n(.*?)\n```\n', flags=re.MULTILINE|re.DOTALL)
-def qtrepl(match):
-  if match.group(1) == 'python':
-    ret = '.. code-block:: python\n'
-  else:
-    ret = '::\n'
-  for line in match.group(2).split('\n'):
-    if len(line.strip()) <= 0:
-      ret += '\n'
-    else:
-      ret += '\n  ' + line
-  return ret + '\n'
-#------------------------------------------------------------------------------
-mdimg = re.compile(r'!\[([^\]]*)\]\((.*?) "([^"]*)"\)')
-imgrepl = '.. image:: \\2\n   :alt: \\1\n'
-#------------------------------------------------------------------------------
-def md2rst(text):
-  text = mdquote.sub(qtrepl, text)
-  text = mdheader.sub(hdrepl, text)
-  text = mdimg.sub(imgrepl, text)
-  return text
-#------------------------------------------------------------------------------
-README = md2rst(README)
-
-test_packages = [
+test_dependencies = [
   'nose                 >= 1.3.0',
   'coverage             >= 3.6',
   ]
 
-install_packages = [
+dependencies = [
+  'distribute           >= 0.6.24',
+  'argparse             >= 1.2.1',
   'csvkit               >= 0.5.0',
+  'SQLAlchemy           >= 0.6.6',
+  'dbf                  >= 0.94.003',
+  'openpyxl             >= 1.5.7',
+  'python-dateutil      >= 1.5',
+  'xlrd                 >= 0.7.1',
   ]
 
-entry_points = {
+entrypoints = {
   'console_scripts': [
     'csvsed             = csvsed.cli:main',
     ],
   }
 
-setup(
+classifiers = [
+  'Development Status :: 4 - Beta',
+  # 'Development Status :: 5 - Production/Stable',
+  'Environment :: Console',
+  'Intended Audience :: Developers',
+  'Intended Audience :: System Administrators',
+  'Natural Language :: English',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python',
+  'Topic :: Software Development',
+  'Topic :: Software Development :: Libraries :: Python Modules',
+  'Topic :: Utilities',
+  'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+  ]
 
-  # generic info
+setup(
   name                  = 'csvsed',
   version               = '0.2.1',
-
-  # build instructions
-  packages              = find_packages(),
-  zip_safe              = True,
-  include_package_data  = True,
-
-  # dependencies
-  install_requires      = install_packages,
-  tests_require         = test_packages,
-
-  # environment
-  test_suite            = 'test',
-  entry_points          = entry_points,
-
-  # metadata for upload to PyPI
-  url                   = 'http://github.com/metagriffin/csvsed',
+  description           = 'A stream-oriented CSV modification tool',
+  long_description      = read('README.rst'),
+  classifiers           = classifiers,
   author                = 'metagriffin',
   author_email          = 'metagriffin@uberdev.org',
-  description           = 'A stream-oriented CSV modification tool',
-  license               = 'MIT (http://opensource.org/licenses/MIT)',
+  url                   = 'http://github.com/metagriffin/csvsed',
   keywords              = 'CSV comma separated values modification substitution translation transliteration command-line library',
+  packages              = find_packages(),
   platforms             = ['any'],
-  classifiers           = [
-    'Development Status :: 4 - Beta',
-    # 'Development Status :: 5 - Production/Stable',
-    'Environment :: Console',
-    'Intended Audience :: Developers',
-    'Intended Audience :: System Administrators',
-    'License :: Public Domain',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Topic :: Software Development',
-    'Topic :: Software Development :: Libraries :: Python Modules',
-    'Topic :: Utilities',
-  ],
-
-  long_description      = README,
-
+  include_package_data  = True,
+  zip_safe              = True,
+  install_requires      = dependencies,
+  tests_require         = test_dependencies,
+  test_suite            = 'csvsed',
+  entry_points          = entrypoints,
+  license               = 'GPLv3+',
 )
 
 #------------------------------------------------------------------------------
