@@ -17,10 +17,10 @@ Installation
 Usage and Examples
 ==================
 
-Installation of the `csvsed` python package also installs the `csvsed`
-command-line tool. Use `csvsed --help` for all command line options,
-but here are some examples to get you going. Given the input file
-``sample.csv``:
+Installation of the `csvsed` python package also installs the
+``csvsed`` command-line tool. Use ``csvsed --help`` for all command
+line options, but here are some examples to get you going. Given the
+input file ``sample.csv``:
 
 .. code-block:: text
 
