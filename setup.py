@@ -59,7 +59,7 @@ classifiers = [
 
 setup(
   name                  = 'csvsed',
-  version               = '0.2.1',
+  version               = '0.2.2',
   description           = 'A stream-oriented CSV modification tool',
   long_description      = read('README.rst'),
   classifiers           = classifiers,
