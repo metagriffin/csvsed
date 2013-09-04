@@ -6,6 +6,38 @@ A stream-oriented CSV modification tool. Like a stripped-down "sed"
 command, but for tabular data.
 
 
+TL;DR
+=====
+
+Install:
+
+.. code-block:: bash
+
+  $ pip install csvsed
+
+Use:
+
+.. code-block:: bash
+
+  # given a sample CSV
+  $ cat sample.csv
+
+  Employee ID,Age,Wage,Status
+  8783,47,"104,343,873.83","All good, but nowhere to go."
+  2003,32,"98,878,784.00",A-OK
+
+  # modify that data with a series of `csvsed` pipes
+  $ cat sample.csv \
+    | csvsed -c Wage s/,//g \                              # remove commas from the Wage column
+    | csvsed -c Status 'y/A-Z/a-z/' \                      # convert Status to all lowercase
+    | csvsed -c Status 's/.*(ok|good).*/\1/' \             # restrict to keywords 'ok' & 'good'
+    | csvsed -c Age 'e/xargs -I {} echo "{}*2" | bc/'      # double the Age column
+
+  Employee ID,Age,Wage,Status
+  8783,94,104343873.83,good
+  2003,64,98878784.00,ok
+
+
 Installation
 ============
 
