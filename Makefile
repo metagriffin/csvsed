@@ -1,5 +1,2 @@
-test:
-	nosetests --verbose
-
-upload:
-	python setup.py sdist upload
+PKGNAME = csvsed
+include Makefile.python
