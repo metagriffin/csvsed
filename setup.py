@@ -28,9 +28,9 @@ if sys.hexversion < 0x02070000:
   raise RuntimeError('This package requires python 2.7 or better')
 
 heredir = os.path.abspath(os.path.dirname(__file__))
-def read(*parts):
+def read(*parts, **kw):
   try:    return open(os.path.join(heredir, *parts)).read()
-  except: return ''
+  except: return kw.get('default', '')
 
 test_dependencies = [
   'nose                 >= 1.3.0',
@@ -70,7 +70,7 @@ classifiers = [
 
 setup(
   name                  = 'csvsed',
-  version               = '0.2.2',
+  version               = read('VERSION.txt', default='0.0.1').strip(),
   description           = 'A stream-oriented CSV modification tool',
   long_description      = read('README.rst'),
   classifiers           = classifiers,
