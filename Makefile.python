@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 # file: $Id$
-# desc: metagriffin's standard python makefile
-# auth: metagriffin <mg.github@uberdev.org>
-# date: 2013/11/08
-# copy: (C) CopyLoose 2013-EOT metagriffin -- see LICENSE.txt
+# auth: metagriffin <mg.github@metagriffin.net>
+# date: 2016/03/18
+# copy: (C) Copyright 2013-EOT metagriffin -- see LICENSE.txt
 #------------------------------------------------------------------------------
 # This software is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as

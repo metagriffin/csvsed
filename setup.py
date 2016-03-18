@@ -1,11 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# file: $Id: setup.py 346 2012-08-12 17:22:39Z griffin $
-# desc: the csvsed installation file
-# auth: metagriffin <metagriffin@uberdev.org>
+# file: $Id$
+# auth: metagriffin <mg.github@metagriffin.net>
 # date: 2009/08/04
-# copy: (C) CopyLoose 2010 UberDev <hardcore@uberdev.org>, No Rights Reserved.
+# copy: (C) Copyright 2016-EOT metagriffin -- see LICENSE.txt
+#------------------------------------------------------------------------------
+# This software is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
 #------------------------------------------------------------------------------
 
 import sys, os, re, setuptools
@@ -23,7 +35,7 @@ def read(*parts):
 test_dependencies = [
   'nose                 >= 1.3.0',
   'coverage             >= 3.6',
-  ]
+]
 
 dependencies = [
   'distribute           >= 0.6.24',
@@ -34,13 +46,13 @@ dependencies = [
   'openpyxl             >= 1.5.7',
   'python-dateutil      >= 1.5',
   'xlrd                 >= 0.7.1',
-  ]
+]
 
 entrypoints = {
   'console_scripts': [
     'csvsed             = csvsed.cli:main',
-    ],
-  }
+  ],
+}
 
 classifiers = [
   'Development Status :: 4 - Beta',
@@ -55,7 +67,7 @@ classifiers = [
   'Topic :: Software Development :: Libraries :: Python Modules',
   'Topic :: Utilities',
   'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-  ]
+]
 
 setup(
   name                  = 'csvsed',
@@ -79,5 +91,6 @@ setup(
 )
 
 #------------------------------------------------------------------------------
-# end of $Id: setup.py 346 2012-08-12 17:22:39Z griffin $
+# end of $Id$
+# $ChangeLog$
 #------------------------------------------------------------------------------

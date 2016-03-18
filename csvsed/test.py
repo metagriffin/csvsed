@@ -1,10 +1,22 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# file: $Id: test_csvmod.py 337 2012-05-26 14:04:45Z griffin $
-# desc: unit test for the 'csvsed' tool
-# auth: metagriffin <metagriffin@uberdev.org>
+# file: $Id$
+# auth: metagriffin <mg.github@metagriffin.net>
 # date: 2011/04/08
-# copy: (C) CopyLoose 2011 UberDev <hardcore@uberdev.org>, No Rights Reserved.
+# copy: (C) Copyright 2011-EOT metagriffin -- see LICENSE.txt
+#------------------------------------------------------------------------------
+# This software is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
 #------------------------------------------------------------------------------
 
 import unittest, StringIO, csvkit
@@ -155,4 +167,5 @@ field 3.1,field 3.2,field 3.3,11.56,field 3.5
 
 #------------------------------------------------------------------------------
 # end of $Id$
+# $ChangeLog$
 #------------------------------------------------------------------------------
