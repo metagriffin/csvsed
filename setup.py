@@ -34,11 +34,10 @@ def read(*parts):
 
 test_dependencies = [
   'nose                 >= 1.3.0',
-  'coverage             >= 3.6',
+  'coverage             >= 3.5.3',
 ]
 
 dependencies = [
-  'distribute           >= 0.6.24',
   'argparse             >= 1.2.1',
   'csvkit               >= 0.5.0',
   'SQLAlchemy           >= 0.6.6',
